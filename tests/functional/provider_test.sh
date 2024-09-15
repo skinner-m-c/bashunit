@@ -34,8 +34,11 @@ function test_single_values_from_data_provider() {
   local current_data="$1"
   local current_iteration=0
 
-  echo "$(awk 'BEGIN{FS=OFS=""} {$1++} {print $1}' "$_TEST_GET_DATA_FROM_PROVIDER_ITERATION_FILE")"\
-    > "$_TEST_GET_DATA_FROM_PROVIDER_ITERATION_FILE"
+  local stored_iteration
+  stored_iteration=$(cat "$_TEST_GET_DATA_FROM_PROVIDER_ITERATION_FILE")
+  stored_iteration=$(( stored_iteration + 1))
+  echo -n "$stored_iteration" > "$_TEST_GET_DATA_FROM_PROVIDER_ITERATION_FILE"
+
   current_iteration=$(cat "$_TEST_GET_DATA_FROM_PROVIDER_ITERATION_FILE")
 
   case $current_iteration in

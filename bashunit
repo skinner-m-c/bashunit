@@ -8,17 +8,18 @@ declare -r BASHUNIT_VERSION="0.15.0"
 declare -r BASHUNIT_ROOT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 export BASHUNIT_ROOT_DIR
 
+source "$BASHUNIT_ROOT_DIR/src/check_os.sh"
+source "$BASHUNIT_ROOT_DIR/src/dependencies.sh"
+source "$BASHUNIT_ROOT_DIR/src/math.sh"
 source "$BASHUNIT_ROOT_DIR/src/dev/debug.sh"
 source "$BASHUNIT_ROOT_DIR/src/default_env_config.sh"
 source "$BASHUNIT_ROOT_DIR/src/env_configuration.sh"
 source "$BASHUNIT_ROOT_DIR/src/clock.sh"
-source "$BASHUNIT_ROOT_DIR/src/check_os.sh"
 source "$BASHUNIT_ROOT_DIR/src/state.sh"
 source "$BASHUNIT_ROOT_DIR/src/colors.sh"
 source "$BASHUNIT_ROOT_DIR/src/console_header.sh"
 source "$BASHUNIT_ROOT_DIR/src/console_results.sh"
 source "$BASHUNIT_ROOT_DIR/src/helpers.sh"
-source "$BASHUNIT_ROOT_DIR/src/upgrade.sh"
 source "$BASHUNIT_ROOT_DIR/src/assertions.sh"
 source "$BASHUNIT_ROOT_DIR/src/logger.sh"
 source "$BASHUNIT_ROOT_DIR/src/runner.sh"
@@ -78,9 +79,15 @@ while [[ $# -gt 0 ]]; do
       trap '' EXIT && exit 0
       ;;
     *)
-      while IFS='' read -r line; do
-        _ARGS+=("$line");
-      done < <(helper::find_files_recursive "$argument")
+      if [[ -n "$_ASSERT_FN" ]]; then
+        while IFS='' read -r line; do
+                  _ARGS+=("$line");
+        done < <(echo "$argument")
+      else
+        while IFS='' read -r line; do
+          _ARGS+=("$line");
+        done < <(helper::find_files_recursive "$argument")
+      fi
       ;;
   esac
   shift

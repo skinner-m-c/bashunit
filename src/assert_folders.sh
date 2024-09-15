@@ -107,7 +107,6 @@ function assert_is_directory_writable() {
 function assert_is_directory_not_writable() {
   local expected="$1"
   local label="${2:-$(helper::normalize_test_function_name "${FUNCNAME[1]}")}"
-
   if [[ ! -d "$expected" || -w "$expected" ]]; then
     state::add_assertions_failed
     console_results::print_failed_test "${label}" "${expected}" "to be not writable" "but is writable"

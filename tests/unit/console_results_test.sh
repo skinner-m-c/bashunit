@@ -1,5 +1,20 @@
 #!/bin/bash
 
+__ORIGINAL_OS=""
+__ORIGINAL_START_TIME=""
+function set_up_before_script() {
+  __ORIGINAL_OS=$_OS
+  ___ORIGINAL_START_TIME="$_START_TIME"
+  source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+}
+
+function tear_down_after_script() {
+  export _OS=$__ORIGINAL_OS
+  export _START_TIME="$___ORIGINAL_START_TIME"
+}
+
+
+
 function mock_all_state_getters() {
   mock state::is_duplicated_test_functions_found echo false
   mock state::get_duplicated_function_names echo ""
@@ -287,10 +302,31 @@ function test_not_render_execution_time() {
   assert_not_matches "Time taken" "$render_result"
 }
 
-function test_render_execution_time_on_osx() {
+function test_render_execution_time_on_osx_without_perl() {
   local render_result
+  mock check_os::is_busybox mock_false
+  mock dependencies::has_perl mock_false
+  mock perl mock_non_existing_fn
+  mock uname echo "Darwin"
+  check_os::init
   render_result=$(
-    _OS='OSX'
+    console_results::render_result
+  )
+
+  assert_matches "Time taken:  ms" "$render_result"
+}
+
+function test_render_execution_time_on_osx_with_perl() {
+  local render_result
+  mock check_os::is_busybox mock_false
+  mock dependencies::has_adjtimex mock_false
+  mock dependencies::has_perl mock_true
+  _START_TIME="1726393394574382186"
+  mock perl echo "1726393394574372186"
+  mock uname echo "Darwin"
+  check_os::init
+  render_result=$(
+  mock perl echo "1726393394574372186";
 
     console_results::render_result
   )
